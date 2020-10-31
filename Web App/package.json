@@ -20,19 +20,20 @@
     "server"
   ],
   "dependencies": {
-    "express": "3.x",
-    "pg": "2.11.x",
-    "nodemailer": "0.3.x",
-    "ejs": "0.8.x",
-    "db-migrate": "0.6.x",
-    "connect-favicons": "0.0.2",
     "async": "*",
-    "imagemagick": "*",
+    "connect-favicons": "0.0.2",
+    "db-migrate": "0.11.11",
+    "db-migrate-pg": "^1.2.2",
+    "ejs": "0.8.x",
+    "express": "3.x",
     "flashify": "*",
-    "http-auth": "*",
     "htpasswd": "*",
+    "http-auth": "*",
+    "imagemagick": "*",
     "moment": "2.5.x",
-    "node-force-domain": "*"
+    "node-force-domain": "*",
+    "nodemailer": "0.3.x",
+    "pg": "8.4.2"
   },
   "devDependencies": {
     "mocha": "*",
