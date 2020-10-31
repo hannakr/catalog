@@ -2,8 +2,9 @@
  * List/display projects routes
  */
 
-var client = require('./../modules/postgres').client
-    , async = require('async');
+var { client, Query } = require('./../modules/postgres');
+var async = require('async');
+// hanna's changes
 
 /*
  * GET home page.
@@ -13,7 +14,7 @@ exports.home = function(req, res){
    async.waterfall([
         function(callback){
             var sql = 'SELECT * FROM projects WHERE published = true AND year = $1 ORDER BY random() LIMIT 50'
-            var query = client.query(sql, [req.params.year]);
+            var query = client.query(new Query(sql, [req.params.year]));
 
             query.on('row', function(row, result){
                 row.assets = [];
@@ -26,7 +27,7 @@ exports.home = function(req, res){
         },
 
         function(projects, callback){
-            var query = client.query('SELECT * FROM assets');
+            var query = client.query(new Query('SELECT * FROM assets'));
 
             query.on('row', function(row, result){
                 result.addRow(row);

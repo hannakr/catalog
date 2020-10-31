@@ -2,10 +2,10 @@
  * Admin routes
  */
 
-var client = require('./../modules/postgres').client
-    , async = require('async')
+var async = require('async')
     , mail = require('./../modules/mail');
 
+var { client, Query } = require('./../modules/postgres');
 /*
  * GET projects to be curated for admin panel
  */
@@ -13,7 +13,7 @@ var client = require('./../modules/postgres').client
 exports.get = function(req, res){
    async.waterfall([
         function(callback){
-            var query = client.query('SELECT  * FROM projects WHERE published = false');
+            var query = client.query(new Query('SELECT  * FROM projects WHERE published = false'));
 
             query.on('row', function(row, result){
                 row.assets = [];
@@ -26,7 +26,7 @@ exports.get = function(req, res){
         },
 
         function(projects, callback){
-            var query = client.query('SELECT  * FROM assets');
+            var query = client.query(new Query('SELECT  * FROM assets'));
 
             query.on('row', function(row, result){
                 result.addRow(row);
@@ -78,7 +78,7 @@ exports.approve = function(req, res){
     // Set project to published = true
     async.waterfall([
         function(callback){
-            var query = client.query("UPDATE projects SET published = true WHERE id = $1 RETURNING email", [req.body.projectid]);
+            var query = client.query(new Query("UPDATE projects SET published = true WHERE id = $1 RETURNING email", [req.body.projectid]));
 
             query.on('row', function (row, result){
                 result.addRow(row);
@@ -110,7 +110,7 @@ exports.reject = function(req, res){
     async.waterfall([
         function(callback){
             // Remove project
-            var query = client.query("DELETE FROM projects WHERE id = $1 RETURNING email", [req.body.projectid]);
+            var query = client.query(new Query("DELETE FROM projects WHERE id = $1 RETURNING email", [req.body.projectid]));
 
             query.on('error', function(error){
                 console.log("Error: " + error);
@@ -131,7 +131,7 @@ exports.reject = function(req, res){
 
         function(email, callback){
             // Remove all assets for project
-            var query = client.query("DELETE FROM assets WHERE projectid = $1", [req.body.projectid]);
+            var query = client.query(new Query("DELETE FROM assets WHERE projectid = $1", [req.body.projectid]));
 
             query.on('error', function(error){
                 console.log("Error: " + error);

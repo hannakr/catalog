@@ -2,10 +2,11 @@
  * Edit routes
  */
 
+var { client, Query } = require('./../modules/postgres');
+
  //TODO: The code in here has a lot of C&P and striginess. Should be re-factored.
 
-var client = require('./../modules/postgres').client
-    , async = require('async')
+var async = require('async')
     , fs = require('fs')
     , imagemagick = require('imagemagick')
     , crypto = require('crypto')
@@ -19,7 +20,7 @@ var client = require('./../modules/postgres').client
 exports.get = function(req, res){
     async.waterfall([
         function(callback){
-            var query = client.query("SELECT * FROM projects WHERE token = $1", [req.route.params.token]);
+            var query = client.query(new Query("SELECT * FROM projects WHERE token = $1", [req.route.params.token]));
 
             query.on('row', function(row, result){
                 result.addRow(row);
@@ -42,7 +43,7 @@ exports.get = function(req, res){
 
         function(project, callback){
 
-            var query = client.query("SELECT * FROM assets WHERE projectid = $1", [project.id]);
+            var query = client.query(new Query("SELECT * FROM assets WHERE projectid = $1", [project.id]));
 
             query.on('row', function(row, result){
                 result.addRow(row);
@@ -77,9 +78,9 @@ exports.update = function(req, res){
     async.series([
         function(callback){
             var token = req.headers.referer.substring(req.headers.referer.lastIndexOf('/') + 1), degree = req.body.degree.toLowerCase();
-            var query = client.query(
+            var query = client.query(new Query(
                 "UPDATE projects SET title = $2, author = $3, website = $4, degree = $5, medium = $6, measurements = $7, published = false WHERE token = $1",
-                [token, req.body.title, req.body.author, req.body.website, degree, req.body.medium, req.body.measurements]);
+                [token, req.body.title, req.body.author, req.body.website, degree, req.body.medium, req.body.measurements]));
 
             query.on('error', function(error){
                 console.log("Error: " + error);
@@ -196,9 +197,9 @@ exports.update = function(req, res){
                                               });
                                         }); // End fs read/write
 
-                                        var assetInsertion = client.query(
+                                        var assetInsertion = client.query(new Query(
                                             "INSERT into assets(projectid, type, url) values($1, $2, $3, $4)",
-                                            [req.body.project, "image", jsonFileURL, file.name]
+                                            [req.body.project, "image", jsonFileURL, file.name])
                                         );
 
                                         assetInsertion.on('error', function(error) {
@@ -248,9 +249,9 @@ exports.update = function(req, res){
                                           });
                                     }); // End fs read/write
 
-                                    var assetInsertion = client.query(
+                                    var assetInsertion = client.query(new Query(
                                         "INSERT into assets(projectid, type, url) values($1, $2, $3, $4)",
-                                        [req.body.project, "image", jsonFileURL, file.name]
+                                        [req.body.project, "image", jsonFileURL, file.name])
                                     );
 
                                     assetInsertion.on('error', function(error) {
@@ -302,9 +303,9 @@ exports.update = function(req, res){
                                   });
                             }); // End fs read/write
 
-                                var assetUpdate = client.query(
+                                var assetUpdate = client.query(new Query(
                                     "UPDATE assets SET projectid = $1, type = $2, url = $3, filename = $4 WHERE assets.id = $5",
-                                    [req.body.project, "image", jsonFileURL, file.name, key]
+                                    [req.body.project, "image", jsonFileURL, file.name, key])
                                 );
 
                                 assetUpdate.on('error', function(error) {
@@ -325,7 +326,7 @@ exports.update = function(req, res){
             if (req.body.delete != undefined) {
                 if (req.body.delete instanceof Array) {
                     req.body.delete.forEach(function(id) {
-                        var query = client.query("DELETE FROM assets WHERE id = $1", [id]);
+                        var query = client.query(new Query("DELETE FROM assets WHERE id = $1", [id]));
 
                         query.on('error', function(error){
                             console.log("Error: " + error);
@@ -336,7 +337,7 @@ exports.update = function(req, res){
                         });
                     });
                 } else {
-                    var query = client.query("DELETE FROM assets WHERE id = $1", [req.body.delete]);
+                    var query = client.query(new Query("DELETE FROM assets WHERE id = $1", [req.body.delete]));
 
                     query.on('error', function(error){
                         console.log("Error: " + error);
@@ -358,9 +359,9 @@ exports.update = function(req, res){
                 } else {
                     videoUrl = req.body.video;
                 }
-                var videoUpdate = client.query(
+                var videoUpdate = client.query(new Query(
                     "UPDATE assets SET projectid = $1, type = $2, url = $3 WHERE assets.id = $4",
-                    [req.body.project, "video", videoUrl, req.body.vid]
+                    [req.body.project, "video", videoUrl, req.body.vid])
                 );
 
                 videoUpdate.on('error', function(error) {
@@ -379,9 +380,9 @@ exports.update = function(req, res){
                     } else {
                         videoUrl = req.body.video;
                     }
-                    var videoInsertion = client.query(
+                    var videoInsertion = client.query(new Query(
                         "INSERT into assets(projectid, type, url) values($1, $2, $3)",
-                        [req.body.project, "video", videoUrl]
+                        [req.body.project, "video", videoUrl])
                     );
 
                     videoInsertion.on('error', function(error) {

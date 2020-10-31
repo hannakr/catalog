@@ -2,8 +2,9 @@
  * Create routes
  */
 
+var { client, Query } = require('./../modules/postgres');
+
 var fs = require('fs')
-    , client = require('./../modules/postgres').client
     , mail = require('./../modules/mail')
     , crypto = require('crypto')
     , async = require('async')
@@ -23,7 +24,7 @@ exports.new = function(req, res){
     async.waterfall([
         function(callback){
             // Check if email already exists in DB
-            var query = client.query("SELECT 1 FROM projects WHERE email = $1 AND year = $2 LIMIT 1", [req.body.email, moment().year()]);
+            var query = client.query(new Query("SELECT 1 FROM projects WHERE email = $1 AND year = $2 LIMIT 1", [req.body.email, moment().year()]));
 
             query.on('row', function (row, result){
                 result.addRow(row);
@@ -81,9 +82,9 @@ exports.new = function(req, res){
                 res.redirect('/create/denied');
                 callback(true); //exits waterfall
             }
-            var query = client.query(
+            var query = client.query(new Query(
                 "INSERT INTO projects(title, author, email, website, degree, medium, measurements, token, year) values($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
-                [req.body.title, req.body.author, req.body.email, req.body.website, degree, req.body.medium, req.body.measurements, token, moment().year()]
+                [req.body.title, req.body.author, req.body.email, req.body.website, degree, req.body.medium, req.body.measurements, token, moment().year()])
             );
 
             query.on('row', function (row, result){
@@ -129,9 +130,9 @@ exports.new = function(req, res){
                         });
                     });
 
-                    var assetInsertion = client.query(
+                    var assetInsertion = client.query(new Query(
                         "INSERT into assets(projectid, type, url, filename) values($1, $2, $3, $4)",
-                        [projectID, "image", jsonFileURL, file.name]
+                        [projectID, "image", jsonFileURL, file.name])
                     );
 
                     assetInsertion.on('error', function(error) {
@@ -155,9 +156,9 @@ exports.new = function(req, res){
                 } else {
                     videoUrl = req.body.video;
                 }
-                var videoInsertion = client.query(
+                var videoInsertion = client.query(new Query(
                     "INSERT into assets(projectid, type, url) values($1, $2, $3)",
-                    [projectID, "video", videoUrl]
+                    [projectID, "video", videoUrl])
                 );
 
                 videoInsertion.on('error', function(error) {

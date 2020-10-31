@@ -2,11 +2,11 @@
  * Projects routes
  */
 
-var fs = require('fs')
-    , async = require('async')
-    , client = require('./../modules/postgres').client
-    , mail = require('./../modules/mail');
-
+var fs = require('fs');
+var async = require('async');
+var mail = require('./../modules/mail');
+var { client, Query } = require('./../modules/postgres');
+    
 /*
  * GET a single project by id
  */
@@ -15,7 +15,7 @@ exports.getProjectById = function(req, res){
    async.waterfall([
         function(callback){
             var sql = 'SELECT * FROM projects WHERE id = $1 AND published = true AND year = $2'
-            var query = client.query(sql, [req.params.id, req.params.year]);
+            var query = client.query(new Query(sql, [req.params.id, req.params.year]));
 
             query.on('row', function(row, result){
                 row.assets = []; //Add an assets property to our results for the next phase
@@ -34,7 +34,7 @@ exports.getProjectById = function(req, res){
         },
 
         function(projects, projectID, callback){
-            var query = client.query('SELECT * FROM assets WHERE projectid = $1', [projectID]);
+            var query = client.query(new Query('SELECT * FROM assets WHERE projectid = $1', [projectID]));
 
             query.on('row', function(row, result){
                 result.addRow(row);
@@ -84,7 +84,7 @@ exports.getProjectsForDegree = function(req, res){
         function(callback){
             var degree = req.params.degree.replace(/-/g, ' ');
             var sql = 'SELECT * FROM projects WHERE degree = $1 AND published = true AND year = $2';
-            var query = client.query(sql, [degree, req.params.year]);
+            var query = client.query(new Query(sql, [degree, req.params.year]));
 
             query.on('row', function(row, result){
                 row.assets = []; //Add an assets property to our results for the next phase
@@ -97,7 +97,7 @@ exports.getProjectsForDegree = function(req, res){
         },
 
         function(projects, callback){
-            var query = client.query('SELECT * FROM assets');
+            var query = client.query(new Query('SELECT * FROM assets'));
 
             query.on('row', function(row, result){
                 result.addRow(row);
@@ -182,7 +182,7 @@ exports.getProjects = function(req, res){
                 params = [req.params.year];
             }
 
-            var query = client.query(sql, params);
+            var query = client.query(new Query(sql, params));
 
             query.on('row', function(row, result){
                 row.assets = [];
@@ -195,7 +195,7 @@ exports.getProjects = function(req, res){
         },
 
         function(projects, callback){
-            var query = client.query('SELECT * FROM assets');
+            var query = client.query(new Query('SELECT * FROM assets'));
 
             query.on('row', function(row, result){
                 result.addRow(row);
