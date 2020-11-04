@@ -15,32 +15,35 @@ chai.use(chaiHttp);
 
 describe('Grad Catalog Tests', function() {
     describe('Home page URL', function() {
-        it('should return 200 OK', function() {
+        it('should return 200 OK', function(done) {
             chai.request(baseURL)
-            .get('/')
-            .res(function (res) {
+            .get('/2020/home')
+            .end(function(err, res) {
                 expect(res).to.have.status(200);
+                done();
             });
         });
     });    
 
     describe('About page URL', function() {
-        it('should return 200 OK', function() {
+        it('should return 200 OK', function(done) {
             chai.request(baseURL)
             .get('/about')
-            .res(function (res) {
+            .end(function(err, res) {
                 expect(res).to.have.status(200);
+                done();
             });
         });
     });
 
     describe('json/:degree', function() {
-        it('should return 200 OK', function() {
+        it('should return 200 OK', function(done) {
             chai.request(baseURL)
-            .get('/json/degree1')
-            .res(function (res) {
+            .get('/json')
+            .end(function (err, res) {
                 expect(res).to.have.status(200);
                 expect(res).to.be.json;
+                done();
             });
         });
     });
