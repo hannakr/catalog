@@ -4,7 +4,9 @@
 
 var mailer = require("nodemailer")
     , config = require('./../modules/config').config;
-var transport = mailer.createTransport("sendmail", {
+var transport = mailer.createTransport({
+    sendmail: true,
+    newline: 'unix',
     path: "/usr/sbin/sendmail"
 });
 

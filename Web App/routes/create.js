@@ -112,16 +112,18 @@ exports.new = function(req, res){
                     , targetPath = appDir + "/public/images/projects/" + uniqueFile
                     , targetThumbPath = appDir + "/public/images/projects/thumbnails/" + uniqueFile
                     , jsonFileURL = "/public/images/projects/" + uniqueFile;
-
                     fs.readFile(file.path, function (err, data) {
+                        if (err) {
+                            console.log("FS Read Error:" + err)
+                        }
                           fs.writeFile(targetPath, data, function (err) {
                             if (err) {
-                                console.log("Error:" + err)
+                                console.log("FS Write Error:" + err)
                             } else {
                                 console.log("File copied");
                                 fs.unlink(tmpPath, function(err){
                                     if (err) {
-                                        console.log("Error:" + err);
+                                        console.log("Unlink Error:" + err);
                                     }
                                 });
                                 // Create thumbnail
@@ -136,7 +138,7 @@ exports.new = function(req, res){
                     );
 
                     assetInsertion.on('error', function(error) {
-                        console.log("Error: " + error)
+                        console.log("Insert Error: " + error)
                     });
 
                     assetInsertion.on('end', function(result){
