@@ -81,9 +81,13 @@ In a file in your document root put a file called database.json
 
 There is [a ticket open](http://github.com/steamclock/catalog/issues/2) in Issues to consolidate the location and contents of the initial configurations into a single place.
 
-6. Run `db-migrate up` until the service tells you there is nothing to do. 
+6. Run `db-migrate up` until the service tells you there is nothing to do.
 
-7. Run `'node app' and navigate to 'localhost:3000' and you should be good to go.
+7. Use the htpasswd utility to create a username and password for the admin user. Save it in a file called htpasswd in the Web App directory
+
+8. Create a folder called projects and projects/thumbnails inside the Web App/public/images folder
+
+9. Run `'node app' and navigate to 'localhost:3000' and you should be good to go.
 
 ## Setting up and Building the iOS app
 ---
